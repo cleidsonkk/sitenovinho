@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Gerenciador Financeiro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-card h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .login-error {
+            color: #ff4757;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        
+        .app-container {
+            display: none;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            color: white;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        .btn-small {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .person-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .person-card.devedor {
+            border-left-color: #ff4757;
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 255, 255, 1));
+        }
+        
+        .person-card.credor {
+            border-left-color: #2ed573;
+            background: linear-gradient(135deg, rgba(46, 213, 115, 0.1), rgba(255, 255, 255, 1));
+        }
+        
+        .person-card.quitado {
+            border-left-color: #747d8c;
+            background: linear-gradient(135deg, rgba(116, 125, 140, 0.1), rgba(255, 255, 255, 1));
+        }
+        
+        .person-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .person-saldo {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .person-details {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .person-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .alert-success {
+            background: rgba(46, 213, 115, 0.1);
+            border: 2px solid #2ed573;
+            color: #27ae60;
+        }
+        
+        .alert-error {
+            background: rgba(255, 71, 87, 0.1);
+            border: 2px solid #ff4757;
+            color: #e74c3c;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .transaction-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .transaction-item.divida {
+            border-left-color: #ff4757;
+        }
+        
+        .transaction-item.pagamento {
+            border-left-color: #2ed573;
+        }
+        
+        .transaction-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .transaction-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            padding-left: 45px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .floating-summary {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, #4834d4, #686de0);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .backup-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .backup-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .backup-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-backup {
+            background: linear-gradient(135deg, #2ed573, #56ab2f);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .btn-restore {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+        
+        .confirmation-modal {
+            text-align: center;
+        }
+        
+        .confirmation-modal h2 {
+            color: #ff4757;
+            margin-bottom: 20px;
+        }
+        
+        .confirmation-modal p {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .confirmation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn-confirm {
+            background: #ff4757;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-cancel {
+            background: #747d8c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .hidden-file-input {
+            display: none;
+        }
+        
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+        
+        .status-online {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .status-offline {
+            background: #ff4757;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .card {
+                border-radius: 15px;
+                padding: 15px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .person-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .person-actions {
+                justify-content: center;
+            }
+            
+            .logout-btn {
+                position: static;
+                margin-top: 10px;
+                width: 100px;
+            }
+            
+            .backup-buttons {
+                flex-direction: column;
+            }
+            
+            .status-indicator {
+                top: 10px;
+                right: 10px;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+        
+        @media print {
+            body { background: white; }
+            .card { box-shadow: none; border: 1px solid #ddd; }
+            .tabs, .btn, .floating-summary, .person-actions, .transaction-actions, .logout-btn, .backup-section, .status-indicator { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Indicador de Status -->
+    <div id="status-indicator" class="status-indicator status-offline" style="display: none;">
+        🔴 Offline
+    </div>
+
+    <!-- Tela de Login -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <h1>💰 Gerenciador Financeiro</h1>
+            <p>Digite a senha para acessar</p>
+            <input type="password" id="password-input" class="login-input" placeholder="Digite sua senha" maxlength="20">
+            <button onclick="login()" class="login-btn">🔓 Entrar</button>
+            <div id="login-error" class="login-error" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Aplicação Principal -->
+    <div id="app-container" class="app-container">
+        <div class="container">
+            <div class="header">
+                <button onclick="logout()" class="logout-btn">🚪 Sair</button>
+                <h1>💰 Gerenciador Financeiro</h1>
+                <p>Controle suas dívidas e recebimentos com banco de dados</p>
+            </div>
+
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('nova-transacao')">➕ Nova</button>
+                    <button class="tab" onclick="showTab('pessoas')">👥 Pessoas</button>
+                    <button class="tab" onclick="showTab('relatorio')">📊 Relatório</button>
+                    <button class="tab" onclick="showTab('historico')">📝 Histórico</button>
+                </div>
+
+                <!-- Aba Nova Transação -->
+                <div id="nova-transacao" class="tab-content active">
+                    <h2>💰 Registrar Transação</h2>
+                    
+                    <div class="alert" style="background: rgba(102, 126, 234, 0.1); border: 2px solid #667eea; color: #667eea; margin-bottom: 20px;">
+                        <strong>💡 Como usar:</strong><br>
+                        • Digite <strong>valor negativo (-80)</strong> quando alguém te DEVE<br>
+                        • Digite <strong>valor positivo (+100)</strong> quando alguém te PAGA<br>
+                        • <strong>🔒 Dados salvos automaticamente no banco de dados!</strong>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome da Pessoa</label>
+                        <input type="text" id="pessoa" placeholder="Ex: Matheus Silva" list="pessoas-list">
+                        <datalist id="pessoas-list"></datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Valor (R$) - Use + para pagamento, - para dívida</label>
+                        <input type="number" id="valor" placeholder="Ex: -80 (deve) ou +100 (pagou)" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição (opcional)</label>
+                        <textarea id="descricao" placeholder="Motivo da transação..." rows="3"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="registrarTransacao()">
+                        <span id="btn-text">💾 Registrar Transação</span>
+                    </button>
+                    
+                    <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; font-size: 14px;">
+                        <strong>📖 Exemplos:</strong><br>
+                        • Matheus <strong>-80</strong> → "Matheus te deve R$ 80"<br>
+                        • Matheus <strong>+100</strong> → "Você deve R$ 20 para Matheus"<br>
+                        • Ana <strong>-50</strong> → "Ana te deve R$ 50"
+                    </div>
+                </div>
+
+                <!-- Aba Pessoas -->
+                <div id="pessoas" class="tab-content">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-pessoas" placeholder="Buscar pessoa..." onkeyup="filtrarPessoas()">
+                    </div>
+
+                    <div class="stats" id="stats-pessoas">
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #ff4757;" id="total-devedores">0</div>
+                            <div class="stat-label">Devedores</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #2ed573;" id="total-credores">0</div>
+                            <div class="stat-label">Credores</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #747d8c;" id="total-quitados">0</div>
+                            <div class="stat-label">Quitados</div>
+                        </div>
+                    </div>
+
+                    <div id="lista-pessoas"></div>
+                    <div id="empty-pessoas" class="empty-state" style="display: none;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+                        <h3>Nenhuma pessoa cadastrada</h3>
+                        <p>Registre sua primeira transação!</p>
+                    </div>
+                </div>
+
+                <!-- Aba Relatório -->
+                <div id="relatorio" class="tab-content">
+                    <h2>📊 Relatório Financeiro</h2>
+                    
+                    <div class="stats" id="stats-relatorio">
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #ff4757;" id="valor-a-receber">R$ 0,00</div>
+                            <div class="stat-label">A Receber</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #2ed573;" id="valor-devido">R$ 0,00</div>
+                            <div class="stat-label">Devo</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #667eea;" id="saldo-liquido">R$ 0,00</div>
+                            <div class="stat-label">Saldo Líquido</div>
+                        </div>
+                    </div>
+
+                    <button class="btn print-btn" onclick="imprimirRelatorio()">
+                        🖨️ Gerar Relatório para Impressão
+                    </button>
+
+                    <!-- Seção de Backup e Restauração -->
+                    <div class="backup-section">
+                        <h3>🔒 Backup e Segurança dos Dados</h3>
+                        <p style="margin-bottom: 15px; color: #666;">
+                            <strong>🎯 Dados salvos no banco de dados!</strong><br>
+                            Suas informações são persistidas automaticamente e não se perdem ao fechar o aplicativo.
+                        </p>
+                        <div class="backup-buttons">
+                            <button class="btn btn-backup" onclick="fazerBackup()">
+                                💾 Fazer Backup
+                            </button>
+                            <button class="btn btn-restore" onclick="document.getElementById('restore-file').click()">
+                                📂 Restaurar Backup
+                            </button>
+                        </div>
+                        <input type="file" id="restore-file" class="hidden-file-input" accept=".json" onchange="restaurarBackup(event)">
+                    </div>
+
+                    <button class="btn btn-danger" onclick="mostrarConfirmacaoLimpeza()" style="margin-top: 20px;">
+                        ⚠️ Limpar Todos os Dados
+                    </button>
+
+                    <div id="relatorio-detalhado"></div>
+                </div>
+
+                <!-- Aba Histórico -->
+                <div id="historico" class="tab-content">
+                    <h2>📝 Histórico de Transações</h2>
+                    
+                    <div class="form-group">
+                        <input type="text" id="search-historico" placeholder="Buscar transações..." onkeyup="filtrarHistorico()">
+                    </div>
+
+                    <div id="lista-transacoes"></div>
+                    <div id="empty-historico" class="empty-state" style="display: none;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📝</div>
+                        <h3>Nenhuma transação registrada</h3>
+                        <p>Suas transações aparecerão aqui!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Carregando...</p>
+            </div>
+
+            <!-- Floating Summary -->
+            <div class="floating-summary" id="floating-summary">
+                <strong id="summary-text"></strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar transação -->
+    <div id="modal-editar" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2>Editar Transação</h2>
+            <div class="form-group">
+                <label>Nome da Pessoa</label>
+                <input type="text" id="edit-pessoa" readonly>
+            </div>
+            <div class="form-group">
+                <label>Valor (R$)</label>
+                <input type="number" id="edit-valor" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="edit-descricao" rows="3"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="salvarEdicao()">💾 Salvar Alterações</button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="modal-confirmacao" class="modal">
+        <div class="modal-content confirmation-modal">
+            <h2>⚠️ ATENÇÃO</h2>
+            <p id="confirmacao-texto">Esta ação não pode ser desfeita!</p>
+            <div class="confirmation-buttons">
+                <button class="btn-cancel" onclick="fecharConfirmacao()">❌ Cancelar</button>
+                <button class="btn-confirm" onclick="confirmarAcao()">✅ Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configurações de segurança
+        const SENHA_CORRETA = 'Matheus2025';
+        let isLoggedIn = false;
+        
+        // Dados em memória sincronizados com o banco de dados
+        let pessoas = {};
+        let transacoes = [];
+        let nextId = 1;
+        let filtroAtual = '';
+        let transacaoEditando = null;
+        let acaoConfirmacao = null;
+        
+        // Status da conexão
+        let isOnline = false;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se já está logado
+            const loginStatus = sessionStorage.getItem('financeiro_logged_in');
+            if (loginStatus === 'true') {
+                mostrarApp();
+            }
+            
+            // Permitir login com Enter
+            document.getElementById('password-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+            
+            // Verificar status da conexão
+            verificarConexao();
+            setInterval(verificarConexao, 30000); // Verificar a cada 30 segundos
+        });
+
+        // Sistema de Login
+        function login() {
+            const senha = document.getElementById('password-input').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            if (senha === SENHA_CORRETA) {
+                sessionStorage.setItem('financeiro_logged_in', 'true');
+                mostrarApp();
+            } else {
+                errorDiv.textContent = '❌ Senha incorreta! Tente novamente.';
+                errorDiv.style.display = 'block';
+                document.getElementById('password-input').value = '';
+                
+                // Vibração de erro se disponível
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+                
+                // Remover erro após 3 segundos
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('financeiro_logged_in');
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('password-input').value = '';
+            isLoggedIn = false;
+        }
+
+        function mostrarApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            isLoggedIn = true;
+            
+            // Carregar dados do banco de dados
+            carregarDados();
+        }
+
+        // Verificar conexão com o backend
+        async function verificarConexao() {
+            try {
+                const response = await fetch('/api/dados');
+                if (response.ok) {
+                    setStatusOnline(true);
+                } else {
+                    setStatusOnline(false);
+                }
+            } catch (error) {
+                setStatusOnline(false);
+            }
+        }
+
+        function setStatusOnline(online) {
+            isOnline = online;
+            const indicator = document.getElementById('status-indicator');
+            
+            if (isLoggedIn) {
+                indicator.style.display = 'block';
+                if (online) {
+                    indicator.className = 'status-indicator status-online';
+                    indicator.textContent = '🟢 Online';
+                } else {
+                    indicator.className = 'status-indicator status-offline';
+                    indicator.textContent = '🔴 Offline';
+                }
+            } else {
+                indicator.style.display = 'none';
+            }
+        }
+
+        // Funções de API
+        async function apiRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`/api${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Erro desconhecido');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Erro na API:', error);
+                mostrarAlerta(`❌ Erro: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Carregar dados do banco de dados
+        async function carregarDados() {
+            try {
+                mostrarLoading(true);
+                const response = await apiRequest('/dados');
+                
+                pessoas = response.data.pessoas || {};
+                transacoes = response.data.transacoes || [];
+                nextId = response.data.nextId || 1;
+                
+                atualizarInterface();
+                mostrarAlerta('✅ Dados carregados do banco de dados!', 'success');
+                setStatusOnline(true);
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                setStatusOnline(false);
+                // Em caso de erro, inicializar com dados vazios
+                pessoas = {};
+                transacoes = [];
+                nextId = 1;
+                atualizarInterface();
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Registrar transação
+        async function registrarTransacao() {
+            const pessoa = document.getElementById('pessoa').value.trim();
+            let valor = parseFloat(document.getElementById('valor').value);
+            const descricao = document.getElementById('descricao').value.trim();
+
+            if (!pessoa) {
+                mostrarAlerta('Por favor, informe o nome da pessoa', 'error');
+                return;
+            }
+
+            if (isNaN(valor) || valor === 0) {
+                mostrarAlerta('Por favor, informe um valor válido (use - para dívidas, + para pagamentos)', 'error');
+                return;
+            }
+
+            try {
+                mostrarLoading(true);
+                
+                // Determinar tipo baseado no sinal do valor
+                const tipo = valor < 0 ? 'divida' : 'pagamento';
+                const valorAbsoluto = Math.abs(valor);
+                
+                const response = await apiRequest('/transacao', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        pessoa: pessoa,
+                        valor: valorAbsoluto,
+                        tipo: tipo,
+                        descricao: descricao
+                    })
+                });
+
+                // Atualizar dados locais
+                const novaTransacao = response.data.transacao;
+                const pessoaAtualizada = response.data.pessoa;
+                
+                transacoes.unshift(novaTransacao);
+                pessoas[pessoa] = pessoaAtualizada;
+                
+                // Limpar formulário
+                document.getElementById('pessoa').value = '';
+                document.getElementById('valor').value = '';
+                document.getElementById('descricao').value = '';
+
+                atualizarInterface();
+                
+                // Mensagem de sucesso
+                const tipoText = tipo === 'divida' ? 'dívida' : 'pagamento';
+                let mensagem = `${tipoText} de R$ ${valorAbsoluto.toFixed(2)} registrado para ${pessoa}!<br>`;
+                
+                const saldoAtual = pessoaAtualizada.saldo;
+                if (saldoAtual > 0) {
+                    mensagem += `<strong>🔴 ${pessoa} te deve R$ ${saldoAtual.toFixed(2)}</strong>`;
+                } else if (saldoAtual < 0) {
+                    mensagem += `<strong>🟢 Você deve R$ ${Math.abs(saldoAtual).toFixed(2)} para ${pessoa}</strong>`;
+                } else {
+                    mensagem += `<strong>✅ ${pessoa} está quitado! Saldo zerado.</strong>`;
+                }
+                
+                mostrarAlerta(mensagem, saldoAtual < 0 ? 'error' : 'success');
+                
+            } catch (error) {
+                console.error('Erro ao registrar transação:', error);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Editar transação
+        function editarTransacao(id) {
+            const transacao = transacoes.find(t => t.id === id);
+            if (!transacao) return;
+            
+            transacaoEditando = transacao;
+            
+            document.getElementById('edit-pessoa').value = transacao.pessoa;
+            document.getElementById('edit-valor').value = transacao.tipo === 'divida' ? -transacao.valor : transacao.valor;
+            document.getElementById('edit-descricao').value = transacao.descricao;
+            
+            document.getElementById('modal-editar').style.display = 'block';
+        }
+
+        // Salvar edição
+        async function salvarEdicao() {
+            if (!transacaoEditando) return;
+            
+            const novoValor = parseFloat(document.getElementById('edit-valor').value);
+            const novaDescricao = document.getElementById('edit-descricao').value.trim();
+            
+            if (isNaN(novoValor) || novoValor === 0) {
+                mostrarAlerta('Por favor, informe um valor válido', 'error');
+                return;
+            }
+            
+            try {
+                mostrarLoading(true);
+                
+                const tipo = novoValor < 0 ? 'divida' : 'pagamento';
+                const valorAbsoluto = Math.abs(novoValor);
+                
+                const response = await apiRequest(`/transacao/${transacaoEditando.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        valor: valorAbsoluto,
+                        tipo: tipo,
+                        descricao: novaDescricao
+                    })
+                });
+                
+                // Atualizar dados locais
+                const transacaoAtualizada = response.data.transacao;
+                const pessoaAtualizada = response.data.pessoa;
+                
+                const index = transacoes.findIndex(t => t.id === transacaoEditando.id);
+                if (index !== -1) {
+                    transacoes[index] = transacaoAtualizada;
+                }
+                
+                if (pessoaAtualizada) {
+                    pessoas[pessoaAtualizada.nome] = pessoaAtualizada;
+                }
+                
+                atualizarInterface();
+                fecharModal();
+                
+                mostrarAlerta('✅ Transação atualizada com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao atualizar transação:', error);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Excluir transação
+        async function excluirTransacao(id) {
+            try {
+                mostrarLoading(true);
+                
+                await apiRequest(`/transacao/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                // Remover dos dados locais
+                transacoes = transacoes.filter(t => t.id !== id);
+                
+                // Recarregar pessoas para atualizar saldos
+                await carregarDados();
+                
+                mostrarAlerta('✅ Transação excluída com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao excluir transação:', error);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Quitar pessoa
+        async function quitarPessoa(nomePessoa) {
+            try {
+                mostrarLoading(true);
+                
+                const response = await apiRequest(`/pessoa/${encodeURIComponent(nomePessoa)}/quitar`, {
+                    method: 'POST'
+                });
+                
+                // Atualizar dados locais
+                const novaTransacao = response.data.transacao;
+                const pessoaAtualizada = response.data.pessoa;
+                
+                transacoes.unshift(novaTransacao);
+                pessoas[nomePessoa] = pessoaAtualizada;
+                
+                atualizarInterface();
+                
+                mostrarAlerta(`✅ ${nomePessoa} foi quitado com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao quitar pessoa:', error);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Excluir pessoa
+        async function excluirPessoa(nomePessoa) {
+            try {
+                mostrarLoading(true);
+                
+                await apiRequest(`/pessoa/${encodeURIComponent(nomePessoa)}`, {
+                    method: 'DELETE'
+                });
+                
+                // Remover dos dados locais
+                delete pessoas[nomePessoa];
+                transacoes = transacoes.filter(t => t.pessoa !== nomePessoa);
+                
+                atualizarInterface();
+                
+                mostrarAlerta(`✅ ${nomePessoa} e todas suas transações foram excluídas.`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao excluir pessoa:', error);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Limpar todos os dados
+        async function limparTodosDados() {
+            try {
+                mostrarLoading(true);
+                
+                await apiRequest('/limpar', {
+                    method: 'DELETE'
+                });
+                
+                // Limpar dados locais
+                pessoas = {};
+                transacoes = [];
+                nextId = 1;
+                
+                atualizarInterface();
+                
+                mostrarAlerta('✅ Todos os dados foram apagados!', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao limpar dados:', error);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Fazer backup
+        async function fazerBackup() {
+            try {
+                const response = await apiRequest('/dados');
+                
+                const dados = {
+                    pessoas: response.data.pessoas,
+                    transacoes: response.data.transacoes,
+                    nextId: response.data.nextId,
+                    timestamp: Date.now(),
+                    version: '3.0',
+                    backup_date: new Date().toLocaleString('pt-BR')
+                };
+                
+                const dataStr = JSON.stringify(dados, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `backup_financeiro_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                mostrarAlerta('✅ Backup criado e baixado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao fazer backup:', error);
+            }
+        }
+
+        // Restaurar backup
+        async function restaurarBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    mostrarLoading(true);
+                    
+                    const dados = JSON.parse(e.target.result);
+                    
+                    // Validar estrutura do backup
+                    if (!dados.pessoas || !dados.transacoes) {
+                        throw new Error('Formato de backup inválido');
+                    }
+                    
+                    await apiRequest('/dados', {
+                        method: 'POST',
+                        body: JSON.stringify(dados)
+                    });
+                    
+                    // Recarregar dados
+                    await carregarDados();
+                    
+                    mostrarAlerta('✅ Backup restaurado com sucesso!', 'success');
+                    
+                } catch (error) {
+                    console.error('Erro ao restaurar backup:', error);
+                    mostrarAlerta('❌ Erro ao restaurar backup. Arquivo inválido.', 'error');
+                } finally {
+                    mostrarLoading(false);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Limpar input
+            event.target.value = '';
+        }
+
+        // Navegação entre abas
+        function showTab(tabName) {
+            // Remove classe active de todas as abas
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Ativa a aba selecionada
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            // Atualiza conteúdo específico da aba
+            if (tabName === 'pessoas') {
+                atualizarListaPessoas();
+            } else if (tabName === 'relatorio') {
+                atualizarRelatorio();
+            } else if (tabName === 'historico') {
+                atualizarHistorico();
+            }
+            
+            atualizarFloatingSummary();
+        }
+
+        // Atualizar interface completa
+        function atualizarInterface() {
+            atualizarDatalist();
+            atualizarListaPessoas();
+            atualizarRelatorio();
+            atualizarHistorico();
+            atualizarFloatingSummary();
+        }
+
+        // Atualizar datalist com pessoas existentes
+        function atualizarDatalist() {
+            const datalist = document.getElementById('pessoas-list');
+            datalist.innerHTML = '';
+            
+            Object.keys(pessoas).forEach(nome => {
+                const option = document.createElement('option');
+                option.value = nome;
+                datalist.appendChild(option);
+            });
+        }
+
+        // Atualizar lista de pessoas
+        function atualizarListaPessoas() {
+            const container = document.getElementById('lista-pessoas');
+            const empty = document.getElementById('empty-pessoas');
+            
+            const listaPessoas = Object.values(pessoas);
+            
+            if (listaPessoas.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            
+            // Aplicar filtro
+            const pessoasFiltradas = listaPessoas.filter(pessoa => 
+                pessoa.nome.toLowerCase().includes(filtroAtual.toLowerCase())
+            );
+            
+            // Ordenar por saldo (maiores devedores primeiro)
+            pessoasFiltradas.sort((a, b) => b.saldo - a.saldo);
+            
+            container.innerHTML = pessoasFiltradas.map(pessoa => {
+                const status = pessoa.saldo > 0 ? 'devedor' : pessoa.saldo < 0 ? 'credor' : 'quitado';
+                const statusText = pessoa.saldo > 0 ? 'Me deve' : pessoa.saldo < 0 ? 'Eu devo' : 'Quitado';
+                const saldoFormatado = Math.abs(pessoa.saldo).toFixed(2);
+                
+                return `
+                    <div class="person-card ${status}">
+                        <div class="person-name">${pessoa.nome}</div>
+                        <div class="person-saldo" style="color: ${pessoa.saldo > 0 ? '#ff4757' : pessoa.saldo < 0 ? '#2ed573' : '#747d8c'}">
+                            ${statusText}: R$ ${saldoFormatado}
+                        </div>
+                        <div class="person-details">
+                            <span>Emprestado: R$ ${pessoa.total_dividas.toFixed(2)}</span>
+                            <span>Pago: R$ ${pessoa.total_pagamentos.toFixed(2)}</span>
+                        </div>
+                        <div class="person-actions">
+                            <button class="btn btn-small btn-success" onclick="quitarPessoa('${pessoa.nome}')">
+                                ✅ Quitar
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="mostrarConfirmacaoExclusao('${pessoa.nome}', 'pessoa')">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Atualizar estatísticas
+            const devedores = listaPessoas.filter(p => p.saldo > 0).length;
+            const credores = listaPessoas.filter(p => p.saldo < 0).length;
+            const quitados = listaPessoas.filter(p => p.saldo === 0).length;
+            
+            document.getElementById('total-devedores').textContent = devedores;
+            document.getElementById('total-credores').textContent = credores;
+            document.getElementById('total-quitados').textContent = quitados;
+        }
+
+        // Filtrar pessoas
+        function filtrarPessoas() {
+            filtroAtual = document.getElementById('search-pessoas').value;
+            atualizarListaPessoas();
+        }
+
+        // Atualizar relatório
+        function atualizarRelatorio() {
+            const listaPessoas = Object.values(pessoas);
+            
+            const valorAReceber = listaPessoas.reduce((total, p) => total + (p.saldo > 0 ? p.saldo : 0), 0);
+            const valorDevido = Math.abs(listaPessoas.reduce((total, p) => total + (p.saldo < 0 ? p.saldo : 0), 0));
+            const saldoLiquido = valorAReceber - valorDevido;
+            
+            document.getElementById('valor-a-receber').textContent = `R$ ${valorAReceber.toFixed(2)}`;
+            document.getElementById('valor-devido').textContent = `R$ ${valorDevido.toFixed(2)}`;
+            document.getElementById('saldo-liquido').textContent = `R$ ${saldoLiquido.toFixed(2)}`;
+            document.getElementById('saldo-liquido').style.color = saldoLiquido >= 0 ? '#2ed573' : '#ff4757';
+            
+            // Relatório detalhado
+            const relatorioDetalhado = document.getElementById('relatorio-detalhado');
+            
+            if (listaPessoas.length === 0) {
+                relatorioDetalhado.innerHTML = '<div class="empty-state"><h3>Nenhum dado para relatório</h3></div>';
+                return;
+            }
+            
+            const devedores = listaPessoas.filter(p => p.saldo > 0).sort((a, b) => b.saldo - a.saldo);
+            const credores = listaPessoas.filter(p => p.saldo < 0).sort((a, b) => a.saldo - b.saldo);
+            
+            let html = '';
+            
+            if (devedores.length > 0) {
+                html += '<h3 style="color: #ff4757; margin-top: 20px;">🔴 Pessoas que me devem:</h3>';
+                devedores.forEach(pessoa => {
+                    html += `
+                        <div class="person-card devedor">
+                            <div class="person-name">${pessoa.nome}</div>
+                            <div class="person-saldo" style="color: #ff4757">R$ ${pessoa.saldo.toFixed(2)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (credores.length > 0) {
+                html += '<h3 style="color: #2ed573; margin-top: 20px;">🟢 Pessoas para quem devo:</h3>';
+                credores.forEach(pessoa => {
+                    html += `
+                        <div class="person-card credor">
+                            <div class="person-name">${pessoa.nome}</div>
+                            <div class="person-saldo" style="color: #2ed573">R$ ${Math.abs(pessoa.saldo).toFixed(2)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            relatorioDetalhado.innerHTML = html;
+        }
+
+        // Atualizar histórico
+        function atualizarHistorico() {
+            const container = document.getElementById('lista-transacoes');
+            const empty = document.getElementById('empty-historico');
+            const filtro = document.getElementById('search-historico').value.toLowerCase();
+            
+            if (transacoes.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            
+            // Filtrar transações
+            const transacoesFiltradas = transacoes.filter(t => 
+                t.pessoa.toLowerCase().includes(filtro) ||
+                (t.descricao && t.descricao.toLowerCase().includes(filtro))
+            );
+            
+            // Ordenar por data (mais recentes primeiro)
+            transacoesFiltradas.sort((a, b) => new Date(b.data) - new Date(a.data));
+            
+            container.innerHTML = transacoesFiltradas.map(transacao => {
+                const data = new Date(transacao.data).toLocaleString('pt-BR');
+                const tipoIcon = transacao.tipo === 'divida' ? '🔴' : '🟢';
+                const tipoText = transacao.tipo === 'divida' ? 'Dívida' : 'Pagamento';
+                
+                return `
+                    <div class="transaction-item ${transacao.tipo}">
+                        <div class="transaction-info">
+                            <strong>${tipoIcon} ${transacao.pessoa}</strong><br>
+                            <span style="color: ${transacao.tipo === 'divida' ? '#ff4757' : '#2ed573'}">
+                                ${tipoText}: R$ ${transacao.valor.toFixed(2)}
+                            </span><br>
+                            <small style="color: #666">${data}</small>
+                            ${transacao.descricao ? `<br><small>${transacao.descricao}</small>` : ''}
+                        </div>
+                        <div class="transaction-actions">
+                            <button class="btn btn-small btn-primary" onclick="editarTransacao(${transacao.id})">
+                                ✏️ Editar
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="mostrarConfirmacaoExclusao(${transacao.id}, 'transacao')">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filtrar histórico
+        function filtrarHistorico() {
+            atualizarHistorico();
+        }
+
+        // Atualizar floating summary
+        function atualizarFloatingSummary() {
+            const listaPessoas = Object.values(pessoas);
+            const valorAReceber = listaPessoas.reduce((total, p) => total + (p.saldo > 0 ? p.saldo : 0), 0);
+            const valorDevido = Math.abs(listaPessoas.reduce((total, p) => total + (p.saldo < 0 ? p.saldo : 0), 0));
+            const saldoLiquido = valorAReceber - valorDevido;
+            
+            const summary = document.getElementById('floating-summary');
+            const summaryText = document.getElementById('summary-text');
+            
+            if (listaPessoas.length > 0) {
+                summaryText.innerHTML = `Saldo: R$ ${saldoLiquido.toFixed(2)} | A receber: R$ ${valorAReceber.toFixed(2)} | Devo: R$ ${valorDevido.toFixed(2)}`;
+                summary.style.display = 'block';
+            } else {
+                summary.style.display = 'none';
+            }
+        }
+
+        // Sistema de Confirmação
+        function mostrarConfirmacaoLimpeza() {
+            document.getElementById('confirmacao-texto').innerHTML = 
+                'Você tem certeza que deseja <strong>APAGAR TODOS OS DADOS</strong> do banco de dados?<br><br>' +
+                'Esta ação irá remover:<br>' +
+                '• Todas as pessoas cadastradas<br>' +
+                '• Todas as transações<br>' +
+                '• Todo o histórico<br><br>' +
+                '<strong>ESTA AÇÃO NÃO PODE SER DESFEITA!</strong>';
+            
+            acaoConfirmacao = limparTodosDados;
+            document.getElementById('modal-confirmacao').style.display = 'block';
+        }
+
+        function mostrarConfirmacaoExclusao(nome, tipo) {
+            let texto = '';
+            if (tipo === 'pessoa') {
+                texto = `Você tem certeza que deseja excluir <strong>${nome}</strong> e todas suas transações do banco de dados?<br><br>Esta ação não pode ser desfeita.`;
+                acaoConfirmacao = () => excluirPessoa(nome);
+            } else if (tipo === 'transacao') {
+                texto = `Você tem certeza que deseja excluir esta transação do banco de dados?<br><br>Esta ação não pode ser desfeita.`;
+                acaoConfirmacao = () => excluirTransacao(nome); // nome aqui é o ID
+            }
+            
+            document.getElementById('confirmacao-texto').innerHTML = texto;
+            document.getElementById('modal-confirmacao').style.display = 'block';
+        }
+
+        function confirmarAcao() {
+            if (acaoConfirmacao) {
+                acaoConfirmacao();
+                acaoConfirmacao = null;
+            }
+            fecharConfirmacao();
+        }
+
+        function fecharConfirmacao() {
+            document.getElementById('modal-confirmacao').style.display = 'none';
+            acaoConfirmacao = null;
+        }
+
+        // Fechar modal
+        function fecharModal() {
+            document.getElementById('modal-editar').style.display = 'none';
+            transacaoEditando = null;
+        }
+
+        // Imprimir relatório
+        function imprimirRelatorio() {
+            window.print();
+        }
+
+        // Mostrar/ocultar loading
+        function mostrarLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.add('show');
+            } else {
+                loading.classList.remove('show');
+            }
+        }
+
+        // Mostrar alerta
+        function mostrarAlerta(mensagem, tipo) {
+            // Remove alertas existentes
+            const alertasExistentes = document.querySelectorAll('.alert');
+            alertasExistentes.forEach(alerta => alerta.remove());
+            
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo}`;
+            alerta.innerHTML = mensagem;
+            
+            // Inserir no início do card
+            const card = document.querySelector('.card');
+            card.insertBefore(alerta, card.firstChild);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                if (alerta.parentNode) {
+                    alerta.remove();
+                }
+            }, 5000);
+            
+            // Scroll para o topo para ver o alerta
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modalEditar = document.getElementById('modal-editar');
+            const modalConfirmacao = document.getElementById('modal-confirmacao');
+            
+            if (event.target === modalEditar) {
+                fecharModal();
+            }
+            if (event.target === modalConfirmacao) {
+                fecharConfirmacao();
+            }
+        }
+    </script>
+</body>
+</html>
+
