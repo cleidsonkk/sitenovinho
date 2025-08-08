@@ -1,8 +1,9 @@
 import os
 from flask import Flask, send_from_directory
 from flask_cors import CORS
-from src.models.financeiro import db
-from src.routes.financeiro import financeiro_bp
+from models.financeiro import db
+from routes.financeiro import financeiro_bp
+
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
